@@ -3,17 +3,26 @@ import requests
 import os
 from celery import Celery
 from dotenv import load_dotenv
-from tasks.fetch_historical_data import fetch_and_store_historical_data
+from pymongo import MongoClient
+
+from .tasks.fetch_historical_data import fetch_and_store_historical_data
 
 load_dotenv()  # take environment variables from .env.
 
 app = Flask(__name__)
+
+# Configure Celery
 app.config['CELERY_BROKER_URL'] = os.getenv('CELERY_BROKER_URL', 'default_broker_url')
 app.config['CELERY_RESULT_BACKEND'] = os.getenv('CELERY_RESULT_BACKEND', 'default_backend_url')
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
 
 WAQI_API_KEY = os.getenv('WAQI_API_KEY', 'default_api_key')
+
+# Configure MongoDB client
+mongo_uri = os.getenv('MONGO_URI', 'mongodb://localhost:27017/mydatabase')
+client = MongoClient(mongo_uri)
+db = client.get_default_database()
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -32,8 +41,9 @@ def search():
 
 def get_aqi(city):
     # Use the WAQI API to get the current AQI data
-    response = requests.get(f'http://api.waqi.info/feed/{city}/?token={WAQI_API_KEY}')
-    return response.json()
+    response = requests.get(f'https://api.waqi.info/search/?keyword={city}&token={WAQI_API_KEY}')
+    # TODO Handle error (ex quota exceeded, nothing found, etc)
+    return response.json()['data'][0]
 
 
 @celery.task

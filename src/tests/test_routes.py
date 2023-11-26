@@ -1,5 +1,5 @@
 from flask_testing import TestCase
-from src.app.app import app
+from app.app import app
 
 class FlaskTestCase(TestCase):
     def create_app(self):

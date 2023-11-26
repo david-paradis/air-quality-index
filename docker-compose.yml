@@ -3,14 +3,14 @@ services:
   web:
     build: .
     ports:
-      - "5000:5000"
+      - "5001:5001"
     depends_on:
       - mongodb
       - rabbitmq
     environment:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
       - CELERY_RESULT_BACKEND=rpc://
-      - MONGO_URI=mongodb://mongodb:27017/yourdbname
+      - MONGO_URI=mongodb://mongodb:27017/air-quality-index
 
   mongodb:
     image: mongo:latest

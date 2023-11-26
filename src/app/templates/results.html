@@ -39,8 +39,9 @@
     <div class="container">
         <h1>Air Quality Index (AQI) Information</h1>
         <div class="aqi-info">
-            <h2>City: {{ aqi_data.city }}</h2>
+            <h2>Station: {{ aqi_data.station.name }}</h2>
             <p>Current AQI: <strong>{{ aqi_data.aqi }}</strong></p>
+            <!-- TODO: Include cautionary information here -->
             <!-- TODO: Include historical data graph here -->
         </div>
         <a href="/" class="back-button">New Search</a>
