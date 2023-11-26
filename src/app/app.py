@@ -5,6 +5,7 @@ from celery import Celery
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
+from .models.air_quality_measurement import AirQualityMeasurement
 from .tasks.fetch_historical_data import fetch_and_store_historical_data
 
 load_dotenv()  # take environment variables from .env.
@@ -29,6 +30,8 @@ def index():
     if request.method == 'POST':
         city = request.form['city']
         aqi_data = get_aqi(city) # Real time data
+        ### https://search.waqi.info/nsearch/station/shanghai 
+        ### Order by score, take first one (already ordered I think, then fetch historical data)
         fetch_historical_data.delay(city)  # Start async task to gather historical data for this city
         return render_template('results.html', aqi_data=aqi_data)
     return render_template('index.html')
