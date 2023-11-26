@@ -1,5 +1,5 @@
 import unittest
-from app.models.air_quality_measurement import AirQualityMeasurement
+from src.app.models.air_quality_measurement import AirQualityMeasurement
 
 class TestAirQualityMeasurement(unittest.TestCase):
     def test_get_risk_level_and_statement(self):

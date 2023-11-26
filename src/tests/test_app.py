@@ -1,6 +1,6 @@
 import unittest
 from unittest import mock
-from app.app import get_aqi
+from src.app.app import get_aqi
 
 class GetAQITestCase(unittest.TestCase):
     def test_get_aqi(self):
