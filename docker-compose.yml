@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+      - rabbitmq
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      - CELERY_RESULT_BACKEND=rpc://
+      - MONGO_URI=mongodb://mongodb:27017/yourdbname
+
+  mongodb:
+    image: mongo:latest
+    volumes:
+      - "mongodb_data:/data/db"
+    ports:
+      - "27017:27017"
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"   # We map the ports so we can access them if needed from our host system
+      - "15672:15672" # Management plugin UI
+
+volumes:
+  mongodb_data:
