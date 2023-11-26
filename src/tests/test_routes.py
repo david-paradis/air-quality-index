@@ -1,3 +1,5 @@
+import unittest
+
 from flask_testing import TestCase
 from app.app import app
 

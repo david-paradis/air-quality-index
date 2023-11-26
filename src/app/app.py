@@ -17,7 +17,7 @@ app.config['CELERY_RESULT_BACKEND'] = os.getenv('CELERY_RESULT_BACKEND', 'defaul
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
 
-WAQI_API_KEY = os.getenv('WAQI_API_KEY', 'default_api_key')
+WAQI_API_KEY = os.getenv('WAQI_API_KEY', 'demo')
 
 # Configure MongoDB client
 mongo_uri = os.getenv('MONGO_URI', 'mongodb://localhost:27017/mydatabase')
