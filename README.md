@@ -1,2 +1,2 @@
-# air-quality-index
+# Air quality index
 Web application show the air quality index of a city
