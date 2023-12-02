@@ -1,51 +1,40 @@
 import pandas as pd
-from pymongo import MongoClient
 from bson import ObjectId
-from dateutil import parser
+from pymongo import MongoClient
+import os
 
 def fetch_and_store_historical_data(city):
+    client = MongoClient(os.getenv('MONGO_URI', 'mongodb://localhost:27017/air-quality-index'), 
+                         username=os.getenv('MONGO_USERNAME', ''),
+                         password=os.getenv('MONGO_PASSWORD', ''))
+    db = client.get_default_database()
+    
     # Configuration variables
-    csv_file_path = 'path_to_your_csv_file.csv'
-    mongo_uri = 'mongodb_connection_string'  # e.g., 'mongodb://localhost:27017'
-    db_name = 'your_database_name'
-    collection_name = 'your_collection_name'
-
-    # Establish a connection to the MongoDB server
-    client = MongoClient(mongo_uri)
-
-    # Select the database and collection
-    db = client[db_name]
-    collection = db[collection_name]
+    csv_file_path = os.getenv('DATA_FILE_PATH','data/waqi-covid-2023.csv')
+    collection = db['aqi-measurements']
 
     # Read the CSV file using pandas
-    data = pd.read_csv(csv_file_path)
+    data = pd.read_csv(csv_file_path, on_bad_lines='skip')
 
-    # TODO Only select the rows for the city
+    # Only select the rows for the selected city
+    data = data.loc[(data['City'] == city) & (data['Specie'] == 'pm25')]
 
     # Iterate over the DataFrame rows and insert into MongoDB
     for index, row in data.iterrows():
         document = transform_row(row)
-        collection.insert_one(document)
+        unique_identifier = {"city": document["city"], "date": document["date"]}
 
-    # Close the connection to MongoDB
+        collection.update_one(unique_identifier, {"$set": document}, upsert=True)
+
     client.close()
+
+    return city
 
 # Helper function to transform a row 
 def transform_row(row):
     return {
-        "_id": ObjectId(),
+        "date": row['Date'], 
         "country": row['Country'],
         "city": row['City'],
-        "specie": row['Specie'],
-        "readings": [
-            {"timestamp": parser.parse(f"{row['Date']}T{hour}:00:00Z"), "value": value}
-            for hour, value in row[['01:00', '02:00', ..., '24:00']].items()  # Replace with actual hour columns
-        ],
-        "summary": {
-            "count": row['count'],
-            "min": row['min'],
-            "max": row['max'],
-            "median": row['median'],
-            "variance": row['variance']
-        }
+        "aqi": row['median']
     }

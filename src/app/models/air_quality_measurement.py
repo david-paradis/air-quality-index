@@ -1,7 +1,8 @@
 class AirQualityMeasurement:
-    def __init__(self, city, aqi):
+    def __init__(self, city, aqi, station_name=None):
         self.city = city
-        self.aqi = aqi
+        self.aqi = float(aqi)
+        self.station_name = station_name
 
     def get_risk_level_and_statement(self):
         if 0 <= self.aqi <= 50:

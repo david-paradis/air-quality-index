@@ -1,7 +1,7 @@
 import unittest
 
 from flask_testing import TestCase
-from src.app.app import app
+from src.app import app
 
 class FlaskTestCase(TestCase):
     def create_app(self):

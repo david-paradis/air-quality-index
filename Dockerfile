@@ -2,20 +2,28 @@
 FROM python:3.9-slim
 
 # Set the working directory in the container
-WORKDIR /usr/src/app
+WORKDIR /usr/
 
 # Copy the requirements.txt file and install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the current directory contents into the container at /usr/src/app
-COPY src/app/ .
+# Copy the entire src directory
+COPY ./src ./src
 
-# Make port 5001 available to the world outside this container
-EXPOSE 5001
+# Copy data 
+COPY ./data ./data
+
+# Set environment variables for Flask
+ENV FLASK_APP src.app
+ENV FLASK_ENV development
+ENV FLASK_DEBUG 1
+
+# Make port 5000 available to the world outside this container
+EXPOSE 5000
 
 # Define environment variable
 ENV NAME World
 
-# Run app.py when the container launches
-CMD ["python3", "app.py"]
+# Run Flask
+CMD ["flask", "run", "--host=0.0.0.0"]

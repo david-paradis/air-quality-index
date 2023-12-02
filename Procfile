@@ -1,1 +1,2 @@
-web: gunicorn src.app.app:app
+web: gunicorn src.app
+celery: celery -A src.app.celery worker --loglevel=info
