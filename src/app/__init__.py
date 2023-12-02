@@ -77,7 +77,6 @@ def check_historical_data(city):
     historical_analysis = db['analysis-tasks'].find_one({"_id": decoded_city})  # Retrieve stored analysis data
     if historical_analysis is None:
         return jsonify({"status": "PENDING"})
-    print(historical_analysis)
     return jsonify({"status": "READY", "data": historical_analysis['result']})
 
 def get_aqi(city):
