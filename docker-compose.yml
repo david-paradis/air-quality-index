@@ -41,7 +41,7 @@ services:
       - MONGO_PASSWORD=root
       - WAQI_API_KEY=ac21802e68e99e31c2d8aa5fb6f19cb496d3e581
       - DATA_FILE_PATH=data/waqi-covid-2023.csv
-    command: -A src.app.celery worker --loglevel=info
+    command: -A src.app.celery worker --loglevel=info -c 4
     depends_on:
       - mongodb
       - rabbitmq
