@@ -18,7 +18,7 @@
         }
 
         function checkTaskStatus(city, counter = 0) {
-            const maxCounter = 5; // 10 seconds divided by 2-second intervals
+            const maxCounter = 10; // 20 seconds divided by 2-second intervals
             if (counter >= maxCounter) {
                 updateNoDataAvailable();
                 return;
