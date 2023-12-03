@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 
+from src.app.helpers import normalize_city_name
+
 def analyze_historical_data(city):
     from pymongo import MongoClient
 
@@ -10,7 +12,8 @@ def analyze_historical_data(city):
     db = client.get_default_database()
     
     # Fetch historical data from database
-    historical_data = list(db['aqi-measurements'].find({'city': city}))
+    normalized_city = normalize_city_name(city)
+    historical_data = list(db['aqi-measurements'].find({'city': normalized_city}))
 
     if not historical_data:
         return {"error": "No historical data found for the city"}
@@ -25,7 +28,7 @@ def analyze_historical_data(city):
 
     # Prepare and return results
     analysis_results = {
-        "city": city,
+        "city": normalized_city,
         "avg_aqi": average_aqi,
         "min_aqi": min_aqi,
         "max_aqi": max_aqi,

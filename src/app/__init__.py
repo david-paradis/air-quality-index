@@ -1,4 +1,5 @@
 from urllib.parse import unquote
+from .helpers import normalize_city_name
 from flask import Flask, request, render_template, jsonify
 import requests
 import os
@@ -59,7 +60,8 @@ def index():
 @app.route('/search', methods=['POST'])
 def search():
     city = request.form['city']
-    aqi_data = get_aqi(city)
+    normalized_city = normalize_city_name(city)
+    aqi_data = get_aqi(normalized_city)
     aqm = None
     if aqi_data and isinstance(aqi_data, dict) and 'aqi' in aqi_data and 'station' in aqi_data and aqi_data['aqi'] != '-':
         aqm = AirQualityMeasurement(city, aqi_data['aqi'], aqi_data['station']['name'])
@@ -74,7 +76,8 @@ def search():
 def check_historical_data(city):
     # Retrieve results from where you stored them
     decoded_city = unquote(city)  # Decode URL-encoded city name
-    historical_analysis = db['analysis-tasks'].find_one({"_id": decoded_city})  # Retrieve stored analysis data
+    normalized_city = normalize_city_name(decoded_city)  # Normalize city name
+    historical_analysis = db['analysis-tasks'].find_one({"_id": normalized_city})  # Retrieve stored analysis data
     if historical_analysis is None:
         return jsonify({"status": "PENDING"})
     return jsonify({"status": "READY", "data": historical_analysis['result']})

@@ -4,14 +4,26 @@
     <script>
         function updateHistoricalData(historicalAnalysis) {
             var historicalDataHtml = `
-                <p><strong>Historical Data: </strong>
+                <p><strong>Historical Data (Last 2 years): </strong>
                     <p>Average AQI: ${historicalAnalysis.avg_aqi}</p>
                     <p>Min AQI: ${historicalAnalysis.min_aqi} - ${historicalAnalysis.min_date} </p>
                     <p>Max AQI: ${historicalAnalysis.max_aqi} - ${historicalAnalysis.max_date} </p>
                 </p>`;
             document.getElementById('historical-data').innerHTML = historicalDataHtml;
         }
-        function checkTaskStatus(city) {
+
+        function updateNoDataAvailable() {
+            var noDataHtml = `<p>Historical data is not available at the moment.</p>`;
+            document.getElementById('historical-data').innerHTML = noDataHtml;
+        }
+
+        function checkTaskStatus(city, counter = 0) {
+            const maxCounter = 5; // 10 seconds divided by 2-second intervals
+            if (counter >= maxCounter) {
+                updateNoDataAvailable();
+                return;
+            }
+
             fetch('/check_historical/' + city)
                 .then(response => response.json())
                 .then(data => {
@@ -19,8 +31,8 @@
                         // Update the page with historical analysis data
                         updateHistoricalData(data.data);
                     } else {
-                        // check again after a delay
-                        setTimeout(() => checkTaskStatus(city), 2000);
+                        // Check again after a delay
+                        setTimeout(() => checkTaskStatus(city, counter + 1), 2000);
                     }
                 });
         }
@@ -73,7 +85,7 @@
             <h2>City: {{ aqm.city }}</h2>
             <p>Station: <strong>{{ aqm.station_name }}</strong></p>
             <p>Current AQI: <strong>{{ aqm.aqi }}</strong></p>
-            <p>Risk: <strong>{{ aqm.get_risk_level_and_statement()[0] }}</strong></p>
+            <p>Risk Level: <strong>{{ aqm.get_risk_level_and_statement()[0] }}</strong></p>
             <p>Cautionary Information: <strong>{{ aqm.get_risk_level_and_statement()[1] }}</strong></p>
             <p id="historical-data">Historical Data: <strong>Loading...</strong></p>
         {% else %}
